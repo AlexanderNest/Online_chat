@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Chat3</string>
+    <string name="messagebox_hint">Введите сообщение</string>
+</resources>
