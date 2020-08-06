@@ -141,7 +141,7 @@ class Network extends AsyncTask<String, Void, String> {  // получение �
     }
     private String sendMessage(String from, String to, String text)  {
         String url = this.server + "?action=sendMessage&from=" + from
-                    + "&to=" + to + "&text=" + text.replaceAll(" ", "%20");
+                + "&to=" + to + "&text=" + text.replaceAll(" ", "%20");
         final String USER_AGENT = "Mozilla/5.0";
 
 
