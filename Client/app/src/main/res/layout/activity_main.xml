@@ -32,23 +32,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TableLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TableRow
-                        android:id="@+id/messageRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@color/authui_colorPrimary">
-
-                        <TextView
-                            android:id="@+id/textView11"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="TextView" />
-                    </TableRow>
-                </TableLayout>
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:background="#AAAAAA"/>
 
             </LinearLayout>
         </ScrollView>
@@ -75,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.9"
                 android:onClick="sendMsgBtn"
-                android:text="Отправить" />
+                android:text="Button" />
 
             <Button
                 android:id="@+id/sendButton"
@@ -83,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"
                 android:onClick="getMsg"
-                android:text="Принять" />
+                android:text="Button" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
