@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/maincont"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -23,32 +24,15 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:rotation="180">
+            android:rotation="180"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:id="@+id/chatBox"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <TableLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TableRow
-                        android:id="@+id/messageRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@color/authui_colorPrimary">
-
-                        <TextView
-                            android:id="@+id/textView11"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="TextView" />
-                    </TableRow>
-                </TableLayout>
 
             </LinearLayout>
         </ScrollView>
@@ -62,28 +46,20 @@
 
             <EditText
                 android:id="@+id/messageBox"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.9"
+                android:layout_weight="0.7"
                 android:ems="10"
                 android:hint="@string/messagebox_hint"
                 android:inputType="textPersonName" />
 
             <Button
                 android:id="@+id/button23"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.9"
+                android:layout_width="128dp"
+                android:layout_height="52dp"
+                android:layout_weight="0.2"
                 android:onClick="sendMsgBtn"
-                android:text="Отправить" />
-
-            <Button
-                android:id="@+id/sendButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.1"
-                android:onClick="getMsg"
-                android:text="Принять" />
+                android:text="@string/send_button" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

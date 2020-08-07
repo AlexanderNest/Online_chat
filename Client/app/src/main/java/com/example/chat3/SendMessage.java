@@ -1,6 +1,7 @@
 package com.example.chat3;
 
 import android.os.AsyncTask;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,7 +11,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 
-class Network extends AsyncTask<String, Void, String> {  // получение погоды в фоне
+class SendMessage extends AsyncTask<String, Void, String> {
 
     private String server = "http://c92618g7.beget.tech/";
 
@@ -21,21 +22,22 @@ class Network extends AsyncTask<String, Void, String> {  // получение �
 
     @Override
     protected String doInBackground(String... parameter) {
-        switch ( parameter[0]){
-            case "getId":
-                return this.getId();
-            case "getMessage":
-                return this.getMessage(parameter[1]);
+        switch (parameter[0]) {
             case "sendMessage":
                 return this.sendMessage(parameter[1], parameter[2], parameter[3]);
-
+            case "getId":
+                return getId();
         }
+        return null;
+    }
 
-        return new String();
+    @Override
+    protected void onProgressUpdate(Void... values) {
+        super.onProgressUpdate(values);
     }
 
 
-    private String getId(){
+    private String getId() {
         String url = this.server + "?action=getId";
         final String USER_AGENT = "Mozilla/5.0";
 
@@ -189,7 +191,7 @@ class Network extends AsyncTask<String, Void, String> {  // получение �
             e.printStackTrace();
         }
 
-        return new String();
+        return "";
     }
 
 }
