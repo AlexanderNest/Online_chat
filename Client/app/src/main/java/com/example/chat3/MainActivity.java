@@ -1,14 +1,20 @@
 package com.example.chat3;
 
 import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,7 +30,14 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+
 public class MainActivity extends AppCompatActivity {
+
+    int convertDpToPixels(Context context, float dp) {
+        float a = dp * context.getResources().getDisplayMetrics().density;
+        int b = (int) a;
+        return b;
+    }
 
     private String user_id = "1";
     private String opponent_id = "1";
@@ -75,8 +88,62 @@ public class MainActivity extends AppCompatActivity {
 
         fl.addView(tv);
 
-        LinearLayout chatbox = (LinearLayout) findViewById(R.id.chatBox);
+        LinearLayout chatbox = findViewById(R.id.chatBox);
         chatbox.addView(fl, 0);
+    }
+
+    public void sendImage(View view) {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        final int IMAGE_SIZE = 250;
+
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+
+        Bitmap bitmap = null;
+
+        FrameLayout fl = new FrameLayout(this);
+        fl.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        fl.setRotation(180);
+
+        ImageView iv = new ImageView(this);
+
+        iv.setBackgroundResource(R.drawable.your_message_background);
+        iv.setPadding(20, 20, 20, 20);
+
+        FrameLayout.LayoutParams p = new FrameLayout.LayoutParams(
+                convertDpToPixels(this, IMAGE_SIZE), convertDpToPixels(this, IMAGE_SIZE));
+        p.gravity = Gravity.RIGHT;
+
+        p.setMargins(40, 20, 40, 20);
+        iv.setLayoutParams(p);
+        iv.setRotation(90);
+
+        fl.addView(iv);
+
+        switch (requestCode) {
+            case 1:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    iv.setImageBitmap(bitmap);
+                }
+        }
+        if ((iv.getDrawable() != null)) {
+            LinearLayout chatbox = findViewById(R.id.chatBox);
+            chatbox.addView(fl, 0);
+        }
     }
 
     /**
@@ -85,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void sendMsgBtn(View view) {
         if (!this.first) {
-            EditText editText = (EditText) findViewById(R.id.messageBox);
+            EditText editText = findViewById(R.id.messageBox);
             String message = editText.getText().toString();
             this.first = true;
             this.user_id = message;
@@ -93,15 +160,26 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         if (!this.second) {
-            EditText editText = (EditText) findViewById(R.id.messageBox);
+            EditText editText = findViewById(R.id.messageBox);
             String message = editText.getText().toString();
             this.second = true;
             this.opponent_id = message;
             editText.setText("");
             return;
         }
+        if (((EditText) findViewById(R.id.messageBox)).getText().toString().equals("image")) {
+            FrameLayout fl = new FrameLayout(this);
+            fl.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT));
+            fl.setRotation(180);
 
-        EditText editText = (EditText) findViewById(R.id.messageBox);
+            ImageView image = new ImageView(this);
+            image.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT));
+            image.setImageResource(R.drawable.messenger_button_white_bg_selector);
+        }
+
+        EditText editText = findViewById(R.id.messageBox);
         String message = editText.getText().toString();
 
         SendMessage n = new SendMessage();
@@ -130,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
 
         fl.addView(tv);
 
-        LinearLayout chatbox = (LinearLayout) findViewById(R.id.chatBox);
+        LinearLayout chatbox = findViewById(R.id.chatBox);
         chatbox.addView(fl, 0);
     }
 
@@ -174,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
 
         fl.addView(tv);
 
-        LinearLayout chatbox = (LinearLayout) findViewById(R.id.chatBox);
+        LinearLayout chatbox = findViewById(R.id.chatBox);
         chatbox.addView(fl, 0);
 
         //editText.setText("");

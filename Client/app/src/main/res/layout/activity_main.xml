@@ -34,6 +34,16 @@
                 android:orientation="vertical">
 
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/testView"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
+                        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                </FrameLayout>
             </LinearLayout>
         </ScrollView>
 
@@ -54,7 +64,15 @@
                 android:inputType="textPersonName" />
 
             <Button
-                android:id="@+id/button23"
+                android:id="@+id/send_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:onClick="sendImage"
+                android:text="Button" />
+
+            <Button
+                android:id="@+id/send_message_button"
                 android:layout_width="128dp"
                 android:layout_height="52dp"
                 android:layout_weight="0.2"
