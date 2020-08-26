@@ -19,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
@@ -29,15 +30,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/login" />
+                android:paddingLeft="25dp"
+                android:text="@string/login"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName"
+                android:id="@+id/nickname_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="25dp"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="textPersonName" />
+                android:hint="@string/name_hint"
+                android:inputType="textPersonName"
+                android:maxLength="20" />
         </LinearLayout>
 
         <LinearLayout
@@ -50,23 +57,30 @@
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
                 android:layout_weight="1"
-                android:text="@string/age" />
+                android:paddingLeft="25dp"
+                android:text="@string/age"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editTextNumberSigned"
+                android:id="@+id/age_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="25dp"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="numberSigned" />
+                android:hint="@string/age_hint"
+                android:inputType="numberSigned"
+                android:maxLength="2" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:orientation="vertical">
 
             <TextView
@@ -75,7 +89,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
-                android:text="@string/your_sex" />
+                android:text="@string/your_sex"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -125,20 +141,21 @@
             </LinearLayout>
 
             <RadioGroup
+                android:id="@+id/your_sex_radioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/radioButton4"
+                    android:id="@+id/your_sex_female"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginRight="170dp"
                     android:gravity="center_horizontal|top" />
 
                 <RadioButton
-                    android:id="@+id/radioButton5"
+                    android:id="@+id/your_sex_male"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
@@ -160,7 +177,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
-                android:text="@string/opponent_sex" />
+                android:text="@string/opponent_sex"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -227,25 +246,27 @@
             </LinearLayout>
 
             <RadioGroup
+                android:id="@+id/opponent_sex_radioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:id="@+id/opponent_sex_male_radio_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
 
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginLeft="52dp" />
 
                 <RadioButton
-                    android:id="@+id/radioButton7"
+                    android:id="@+id/opponent_sex_female_radio_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="105dp" />
 
                 <RadioButton
-                    android:id="@+id/radioButton8"
+                    android:id="@+id/opponent_sex_all_radio_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="103dp" />
@@ -254,13 +275,22 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/start_searching_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="40dp"
-            android:text="@string/start_searching" />
+            android:background="@drawable/start_searching_background"
+            android:onClick="startSearching"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
+            android:text="@string/start_searching"
+            android:textColor="@color/white" />
+
 
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,18 +2,26 @@ package com.example.chat3;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
@@ -36,6 +44,12 @@ public class MainActivity extends AppCompatActivity {
 
     private String user_id = "1";
     private String opponent_id = "1";
+
+    private String your_nickname = null;
+    private String opponent_nickname = null;
+    private String your_sex = null;
+    private String opponent_sex = null;
+
     private boolean first;
     private boolean second;
 
@@ -51,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_settings);
+        showLicense();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         this.first = false;
@@ -58,7 +73,24 @@ public class MainActivity extends AppCompatActivity {
 
         GetMessage gm = new GetMessage();
         startAsyncTaskInParallel(gm);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.support:
+                Intent browserIntent = new
+                        Intent(Intent.ACTION_VIEW, Uri.parse(ServerSettings.telegram));
+                startActivity(browserIntent);
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
     public void printId() {
@@ -85,6 +117,94 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout chatbox = findViewById(R.id.chatBox);
         chatbox.addView(fl, 0);
+    }
+
+    public void showLicense() {
+        String license = getString(R.string.license);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Условия использования приложения")
+                .setMessage(license)
+                .setCancelable(false)
+                .setPositiveButton("Закрыть приложение",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                finish();
+                            }
+                        })
+                .setNegativeButton("Я прочитал(-а) условия использования и " +
+                                "согласен(-на) с условиями",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public void startSearching(View view) {
+        EditText nickname = findViewById(R.id.nickname_edittext);
+        EditText age = findViewById(R.id.age_edittext);
+        RadioGroup yoursex_rg = findViewById(R.id.your_sex_radioGroup);
+        RadioGroup opponentsex_rg = findViewById(R.id.opponent_sex_radioGroup);
+
+
+        int yoursex = yoursex_rg.getCheckedRadioButtonId();
+        int opponentsex = opponentsex_rg.getCheckedRadioButtonId();
+
+        switch (yoursex) {
+            case R.id.your_sex_male:
+                //ваш пол мужской
+                this.your_sex = "m";
+                break;
+            case R.id.your_sex_female:
+                //ваш пол женский
+                this.your_sex = "f";
+                break;
+            default:
+                Toast toast = Toast.makeText(getApplicationContext(), "Выберите ваш пол",
+                        Toast.LENGTH_LONG);
+                toast.show();
+                return;
+
+
+        }
+
+
+        switch (opponentsex) {
+            case R.id.opponent_sex_male_radio_button:
+                //ищем мужской
+                this.opponent_sex = "m";
+                break;
+            case R.id.opponent_sex_female_radio_button:
+                // ищем женский
+                this.opponent_sex = "f";
+                break;
+            case R.id.opponent_sex_all_radio_button:
+                //неважно кого искать
+                this.opponent_sex = "all";
+            default:
+                Toast toast = Toast.makeText(getApplicationContext(), "Выберите пол собеседника",
+                        Toast.LENGTH_LONG);
+                toast.show();
+                return;
+
+        }
+
+        this.your_nickname = nickname.getText().toString();
+
+        if (this.your_nickname.length() <= 0) {
+            Toast toast = Toast.makeText(getApplicationContext(), "Введите ваше имя",
+                    Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        setContentView(R.layout.activity_opponent_searching);
+    }
+
+    public void stopSearching(View view) {
+        setContentView(R.layout.activity_start_settings);
     }
 
     /**
