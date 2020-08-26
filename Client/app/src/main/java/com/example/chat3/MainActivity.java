@@ -2,14 +2,10 @@ package com.example.chat3;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
@@ -29,7 +25,6 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_start_settings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         this.first = false;
@@ -90,60 +85,6 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout chatbox = findViewById(R.id.chatBox);
         chatbox.addView(fl, 0);
-    }
-
-    public void sendImage(View view) {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, 1);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-        final int IMAGE_SIZE = 250;
-
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-
-
-        Bitmap bitmap = null;
-
-        FrameLayout fl = new FrameLayout(this);
-        fl.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-        fl.setRotation(180);
-
-        ImageView iv = new ImageView(this);
-
-        iv.setBackgroundResource(R.drawable.your_message_background);
-        iv.setPadding(20, 20, 20, 20);
-
-        FrameLayout.LayoutParams p = new FrameLayout.LayoutParams(
-                convertDpToPixels(this, IMAGE_SIZE), convertDpToPixels(this, IMAGE_SIZE));
-        p.gravity = Gravity.RIGHT;
-
-        p.setMargins(40, 20, 40, 20);
-        iv.setLayoutParams(p);
-        iv.setRotation(90);
-
-        fl.addView(iv);
-
-        switch (requestCode) {
-            case 1:
-                if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    iv.setImageBitmap(bitmap);
-                }
-        }
-        if ((iv.getDrawable() != null)) {
-            LinearLayout chatbox = findViewById(R.id.chatBox);
-            chatbox.addView(fl, 0);
-        }
     }
 
     /**
@@ -290,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
     class GetMessage extends AsyncTask<Void, String, Void> {  // получение погоды в фоне
 
-        private String server = "http://c92618g7.beget.tech/";
+        private String server = ServerSettings.url;
 
         @Override
         protected void onProgressUpdate(String... values) {

@@ -2,4 +2,13 @@
     <string name="app_name">Chat3</string>
     <string name="messagebox_hint">Введите сообщение</string>
     <string name="send_button">send</string>
+    <string name="login">Введите ваше имя</string>
+    <string name="age">Введите ваш возраст</string>
+    <string name="your_sex">Выберите ваш пол</string>
+    <string name="male">Мужской</string>
+    <string name="female">Женский</string>
+    <string name="all_sex">Неважно</string>
+    <string name="opponent_sex">Выберите пол собеседника</string>
+    <string name="start_searching">Начать поиск</string>
+
 </resources>
