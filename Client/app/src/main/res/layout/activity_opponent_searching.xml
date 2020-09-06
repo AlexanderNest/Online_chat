@@ -46,7 +46,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/start_searching_background"
             android:onClick="stopSearching"
-            android:text="@string/stop_searching" />
+            android:text="@string/stop_searching"
+            android:textColor="@color/white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

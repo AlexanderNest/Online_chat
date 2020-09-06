@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,11 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private String user_id = "1";
     private String opponent_id = "1";
 
+    GetMessage gm;
+    Search search;
+
+
     private String your_nickname = null;
     private String opponent_nickname = null;
     private String your_sex = null;
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean first;
     private boolean second;
+
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void startAsyncTaskInParallel(GetMessage task) {
@@ -61,18 +64,40 @@ public class MainActivity extends AppCompatActivity {
             task.execute();
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void startAsyncTaskInParallel(Search task) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        else
+            task.execute(this.user_id);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start_settings);
-        showLicense();
+        this.user_id = getId();
+
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setContentView(R.layout.activity_start_light_version);
 
-        this.first = false;
-        this.second = false;
+        SharedPreferences sp = getSharedPreferences("my_settings",
+                Context.MODE_PRIVATE);
+        // проверяем, первый ли раз открывается программа
+        boolean hasVisited = sp.getBoolean("hasVisited", false);
 
-        GetMessage gm = new GetMessage();
-        startAsyncTaskInParallel(gm);
+        if (hasVisited) {
+            showLicense();
+            SharedPreferences.Editor e = sp.edit();
+            e.putBoolean("hasVisited", true);
+            e.commit();
+        }
+
+
+
+       /* this.first = false;
+        this.second = false;*/
+
+
     }
 
     @Override
@@ -82,12 +107,18 @@ public class MainActivity extends AppCompatActivity {
                 Intent browserIntent = new
                         Intent(Intent.ACTION_VIEW, Uri.parse(ServerSettings.telegram));
                 startActivity(browserIntent);
+                break;
+            case R.id.close_dialog:
+                gm.cancel(true);
+                setContentView(R.layout.activity_start_light_version);
+                break;
 
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
+
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -144,6 +175,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startSearching(View view) {
+        this.search = new Search();
+        startAsyncTaskInParallel(this.search);
+    }
+    /*public void startSearching(View view) {
         EditText nickname = findViewById(R.id.nickname_edittext);
         EditText age = findViewById(R.id.age_edittext);
         RadioGroup yoursex_rg = findViewById(R.id.your_sex_radioGroup);
@@ -163,12 +198,9 @@ public class MainActivity extends AppCompatActivity {
                 this.your_sex = "f";
                 break;
             default:
-                Toast toast = Toast.makeText(getApplicationContext(), "Выберите ваш пол",
-                        Toast.LENGTH_LONG);
-                toast.show();
+                Toast.makeText(getApplicationContext(), "Выберите ваш пол",
+                        Toast.LENGTH_LONG).show();
                 return;
-
-
         }
 
 
@@ -200,11 +232,11 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
             return;
         }
-        setContentView(R.layout.activity_opponent_searching);
-    }
+    }*/
 
     public void stopSearching(View view) {
-        setContentView(R.layout.activity_start_settings);
+        setContentView(R.layout.activity_start_light_version);
+        this.search.cancel(true);
     }
 
     /**
@@ -212,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
      * обработчик кнопки
      */
     public void sendMsgBtn(View view) {
-        if (!this.first) {
+        /*if (!this.first) {
             EditText editText = findViewById(R.id.messageBox);
             String message = editText.getText().toString();
             this.first = true;
@@ -227,18 +259,7 @@ public class MainActivity extends AppCompatActivity {
             this.opponent_id = message;
             editText.setText("");
             return;
-        }
-        if (((EditText) findViewById(R.id.messageBox)).getText().toString().equals("image")) {
-            FrameLayout fl = new FrameLayout(this);
-            fl.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT));
-            fl.setRotation(180);
-
-            ImageView image = new ImageView(this);
-            image.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT));
-            image.setImageResource(R.drawable.messenger_button_white_bg_selector);
-        }
+        }*/
 
         EditText editText = findViewById(R.id.messageBox);
         String message = editText.getText().toString();
@@ -288,10 +309,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getMsg(String message) {
-
-        SendMessage n = new SendMessage();
-
-
         FrameLayout fl = new FrameLayout(this);
         fl.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT));
@@ -315,41 +332,9 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout chatbox = findViewById(R.id.chatBox);
         chatbox.addView(fl, 0);
-
-        //editText.setText("");
-
-        /*TextView msg = new TextView(this);
-        msg.setText(message);
-        msg.setLayoutParams( new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        msg.setSingleLine(false);
-
-        TextView status = new TextView(this);
-
-
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams params=  new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(600, 50,50,0);
-        layout.setLayoutParams(params);
-        layout.addView(msg);
-        layout.setRotation(180);
-        layout.setBackgroundColor(getResources().getColor(R.color.colorGetter));
-        layout.setGravity(Gravity.LEFT);
-        layout.setPadding(10,10,10,10);
-
-        LinearLayout chatbox = (LinearLayout)  findViewById(R.id.chatBox);
-        chatbox.addView(layout, 0);*/
-
-
     }
 
-    class GetMessage extends AsyncTask<Void, String, Void> {  // получение погоды в фоне
+    class GetMessage extends AsyncTask<Void, String, Void> {
 
         private String server = ServerSettings.url;
 
@@ -367,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
                     publishProgress(message);
                 }
                 try {
-                    TimeUnit.SECONDS.sleep(1);
+                    TimeUnit.SECONDS.sleep(3);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -432,6 +417,220 @@ public class MainActivity extends AppCompatActivity {
 
             return response.toString();
         }
+    }
+
+    class Search extends AsyncTask<String, Void, Void> {
+
+        final private String server = ServerSettings.url;
+        private String opponent_id;
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            MainActivity.this.setContentView(R.layout.activity_opponent_searching);
+
+
+                   /* Toast toast = Toast.makeText(getApplicationContext(),
+                            "id - " + MainActivity.this.user_id, Toast.LENGTH_SHORT);
+                    toast.show();*/
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            MainActivity.this.setContentView(R.layout.activity_chat);
+
+            MainActivity.this.gm = new GetMessage();
+            startAsyncTaskInParallel(gm);
+
+            /*Toast toast = Toast.makeText(getApplicationContext(),
+                    "opp - " + MainActivity.this.opponent_id, Toast.LENGTH_SHORT);
+            toast.show();*/
+        }
+
+        @Override
+        protected Void doInBackground(String... parameter) {
+
+            String inQueue_response = "null";
+            String user_id = MainActivity.this.user_id;
+            inQueue_response = getInLine(user_id);
+
+
+            String opponent = "";
+
+            while (opponent.length() <= 0) {
+                opponent = check_pair(user_id);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            MainActivity.this.opponent_id = opponent;
+
+            return null;
+        }
+
+        private String accept(String id) {
+            String url = this.server + "?action=accept&user_id=" + id;
+            final String USER_AGENT = "Mozilla/5.0";
+
+
+            URL obj = null;
+            try {
+                obj = new URL(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection con = null;
+            try {
+                con = (HttpURLConnection) obj.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                con.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String inputLine = "";
+            StringBuffer response = new StringBuffer();
+
+            while (true) {
+                try {
+                    if (in != null)
+                        if (!((inputLine = in.readLine()) != null)) break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                response.append(inputLine);
+            }
+            try {
+                if (in != null)
+                    in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return response.toString();
+        }
+
+        private String check_pair(String id) {
+            String url = this.server + "?action=checkPair&user_id=" + id;
+            final String USER_AGENT = "Mozilla/5.0";
+
+
+            URL obj = null;
+            try {
+                obj = new URL(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection con = null;
+            try {
+                con = (HttpURLConnection) obj.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                con.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String inputLine = "";
+            StringBuffer response = new StringBuffer();
+
+            while (true) {
+                try {
+                    if (in != null)
+                        if (!((inputLine = in.readLine()) != null)) break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                response.append(inputLine);
+            }
+            try {
+                if (in != null)
+                    in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return response.toString();
+        }
+
+        private String getInLine(String id) {
+
+            String url = this.server + "?action=getInLine&user_id=" + id;
+            final String USER_AGENT = "Mozilla/5.0";
+
+
+            URL obj = null;
+            try {
+                obj = new URL(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection con = null;
+            try {
+                con = (HttpURLConnection) obj.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                con.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String inputLine = "";
+            StringBuffer response = new StringBuffer();
+
+            while (true) {
+                try {
+                    if (in != null)
+                        if (!((inputLine = in.readLine()) != null)) break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                response.append(inputLine);
+            }
+            try {
+                if (in != null)
+                    in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return response.toString();
+        }
+
     }
 }
 

@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Анонимный чат</string>
+
+    <string name="app_name" translatable="false">Анонимный чат</string>
     <string name="messagebox_hint">Введите сообщение</string>
     <string name="send_button">send</string>
     <string name="login">Введите ваше ник</string>
@@ -18,9 +19,18 @@
         Поиск собеседника может занять долгое время, так как приложение новое.
         Также попробуйте изменить параметры поиска.
     </string>
+    <string name="close_dialog">Закончить диалог</string>
+
+    <string name="start_instruction_light">
+        Когда будете готовы начать диалог,
+        нажмите на кнопку. Проявляйте уважение к собеседнику.\n
+        Вы начнете общение со случайным собеседником.
+    </string>
 
     <string name="connection_with_support">Связь с разработчиком</string>
 
+
+    <string name="banner_ad_unit_id">ca-app-pub-4521312710447672/3055315310</string>
 
     <string name="license">
        ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ
