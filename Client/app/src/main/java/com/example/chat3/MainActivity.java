@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -72,6 +73,14 @@ public class MainActivity extends AppCompatActivity {
             task.execute(this.user_id);
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void startAsyncTaskInParallel(CloseChat task) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        else
+            task.execute(this.user_id);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(browserIntent);
                 break;
             case R.id.close_dialog:
+                this.search.cancel(true);
+                startAsyncTaskInParallel(new CloseChat());
                 gm.cancel(true);
                 setContentView(R.layout.activity_start_light_version);
                 break;
@@ -237,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
     public void stopSearching(View view) {
         setContentView(R.layout.activity_start_light_version);
         this.search.cancel(true);
+        startAsyncTaskInParallel(new CloseChat());
     }
 
     /**
@@ -345,8 +357,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
+        protected void onPostExecute(Void avoid) {
+            super.onPostExecute(avoid);
+
+// Java
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Ваш собеседник завершил диалог", Toast.LENGTH_LONG);
+            toast.show();
+            MainActivity.this.setContentView(R.layout.activity_start_light_version);
+        }
+
+        @Override
         protected Void doInBackground(Void... voids) {
             while (true) {
+                if (dialogIsOver(MainActivity.this.user_id)) {
+                    break;
+                }
                 String message = this.getMessage(user_id);
                 if (message.length() > 0) {
                     publishProgress(message);
@@ -358,11 +384,67 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
+
+            return null;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+        }
+
+        private boolean dialogIsOver(String id) {
+            String url = this.server + "?action=isClosed&user_id=" + id;
+            final String USER_AGENT = "Mozilla/5.0";
+
+
+            URL obj = null;
+            try {
+                obj = new URL(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection con = null;
+            try {
+                con = (HttpURLConnection) obj.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                con.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String inputLine = "";
+            StringBuffer response = new StringBuffer();
+
+            while (true) {
+                try {
+                    if (in != null)
+                        if (!((inputLine = in.readLine()) != null)) break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                response.append(inputLine);
+            }
+            try {
+                if (in != null)
+                    in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return response.toString().equals("1");
+
         }
 
         private String getMessage(String id) {
@@ -631,6 +713,73 @@ public class MainActivity extends AppCompatActivity {
             return response.toString();
         }
 
+    }
+
+
+    class CloseChat extends AsyncTask<String, Void, Void> {
+
+        final private String server = ServerSettings.url;
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(String... parameter) {
+            closeDialog(MainActivity.this.user_id);
+            return null;
+        }
+
+        private void closeDialog(String id) {
+            String url = this.server + "?action=closeDialog&user_id=" + id;
+            final String USER_AGENT = "Mozilla/5.0";
+
+            URL obj = null;
+            try {
+                obj = new URL(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection con = null;
+            try {
+                con = (HttpURLConnection) obj.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                con.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String inputLine = "";
+            StringBuffer response = new StringBuffer();
+
+            while (true) {
+                try {
+                    if (in != null)
+                        if (!((inputLine = in.readLine()) != null)) break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                response.append(inputLine);
+            }
+            try {
+                if (in != null)
+                    in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 
