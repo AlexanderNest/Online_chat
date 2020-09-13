@@ -55,12 +55,14 @@
 
 
             <Button
+                android:background="@drawable/send_button"
                 android:id="@+id/send_message_button"
                 android:layout_width="128dp"
                 android:layout_height="52dp"
                 android:layout_weight="0.2"
                 android:onClick="sendMsgBtn"
-                android:text="@string/send_button" />
+                android:text="@string/send_button"
+                android:textColor="@color/white" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -127,6 +127,10 @@ public class MainActivity extends AppCompatActivity {
                 gm.cancel(true);  // завершаем поиск сообщений
                 setContentView(R.layout.activity_start_light_version);
                 break;
+            case R.id.in_develop:
+                this.showFeatures();
+                break;
+
 
         }
         return super.onOptionsItemSelected(item);
@@ -137,6 +141,27 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    /**
+     * Содание окна "в разработке"
+     */
+
+    public void showFeatures() {
+        String text = getString(R.string.in_develop_text);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("В разработке")
+                .setMessage(text)
+                .setCancelable(true)
+                .setPositiveButton("Закрыть",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     /**
