@@ -1,4 +1,4 @@
-package com.example.chat3;
+package com.nestapp.chat3;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+
 public class MainActivity extends AppCompatActivity {
 
     int convertDpToPixels(Context context, float dp) {
@@ -53,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private String your_sex = null;
     private String opponent_sex = null;
 
-    private boolean first;
-    private boolean second;
+    /*private boolean first;
+    private boolean second;*/
 
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startSearching(View view) {
+        this.user_id = getId();
         this.search = new Search();
         startAsyncTaskInParallel(this.search);
     }
