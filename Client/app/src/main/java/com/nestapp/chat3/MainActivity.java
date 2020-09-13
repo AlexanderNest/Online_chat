@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -48,16 +47,12 @@ public class MainActivity extends AppCompatActivity {
     GetMessage gm;
     Search search;
 
-
-    private String your_nickname = null;
-    private String opponent_nickname = null;
-    private String your_sex = null;
-    private String opponent_sex = null;
-
-    /*private boolean first;
-    private boolean second;*/
-
-
+    /**
+     * Подобные методы предназначены для того, чтобы корректно запускать asynctask
+     * в зависимости от версии android
+     *
+     * @param task
+     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void startAsyncTaskInParallel(GetMessage task) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
@@ -85,43 +80,51 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.user_id = getId();
-
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_start_light_version);
-
-        SharedPreferences sp = getSharedPreferences("my_settings",
-                Context.MODE_PRIVATE);
-        // проверяем, первый ли раз открывается программа
-        boolean hasVisited = sp.getBoolean("hasVisited", false);
-
-        if (hasVisited) {
-            showLicense();
-            SharedPreferences.Editor e = sp.edit();
-            e.putBoolean("hasVisited", true);
-            e.commit();
-        }
-
-
-
-       /* this.first = false;
-        this.second = false;*/
-
-
+        this.getPreferences(); //
     }
 
+    /**
+     * Если пользователь еще не заходил в приложение, то выводим пользовательское соглашение
+     */
+    private void getPreferences() {
+        SharedPreferences settings = getSharedPreferences("active ", MODE_PRIVATE);
+        boolean hasVisited = settings.getBoolean("hasVisited", false);
+
+        if (!hasVisited) {
+            this.showLicense();
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("hasVisited", true);
+            editor.commit();
+        }
+    }
+
+
+    /**
+     * пользовательское меню вверху
+     * функции:
+     * - написать разработчику
+     * - завершить диалог
+     * - в разработке
+     *
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.support:
+                // Кнопка "поддержка"
                 Intent browserIntent = new
                         Intent(Intent.ACTION_VIEW, Uri.parse(ServerSettings.telegram));
                 startActivity(browserIntent);
                 break;
             case R.id.close_dialog:
+                // кнопка завершить диалог
                 this.search.cancel(true);
-                startAsyncTaskInParallel(new CloseChat());
-                gm.cancel(true);
+                startAsyncTaskInParallel(new CloseChat());  // работа с бд для завершения диалога
+                gm.cancel(true);  // завершаем поиск сообщений
                 setContentView(R.layout.activity_start_light_version);
                 break;
 
@@ -136,32 +139,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void printId() {
-        FrameLayout fl = new FrameLayout(this);
-        fl.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-        fl.setRotation(180);
-
-        TextView tv = new TextView(this);
-
-        tv.setText("Ваш идентификатор: " + this.user_id);
-        tv.setTextSize(20);
-        tv.setBackgroundResource(R.drawable.your_message_background);
-        tv.setPadding(20, 20, 20, 20);
-
-        FrameLayout.LayoutParams p = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-        p.gravity = Gravity.RIGHT;
-
-        p.setMargins(40, 20, 40, 20);
-        tv.setLayoutParams(p);
-
-        fl.addView(tv);
-
-        LinearLayout chatbox = findViewById(R.id.chatBox);
-        chatbox.addView(fl, 0);
-    }
-
+    /**
+     * Создание окна демонстрации пользовательского соглашения
+     */
     public void showLicense() {
         String license = getString(R.string.license);
 
@@ -186,67 +166,22 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
+    /**
+     * Обработчик нажатия кнопки "Начать поиск"
+     *
+     * @param view
+     */
     public void startSearching(View view) {
         this.user_id = getId();
         this.search = new Search();
         startAsyncTaskInParallel(this.search);
     }
-    /*public void startSearching(View view) {
-        EditText nickname = findViewById(R.id.nickname_edittext);
-        EditText age = findViewById(R.id.age_edittext);
-        RadioGroup yoursex_rg = findViewById(R.id.your_sex_radioGroup);
-        RadioGroup opponentsex_rg = findViewById(R.id.opponent_sex_radioGroup);
 
-
-        int yoursex = yoursex_rg.getCheckedRadioButtonId();
-        int opponentsex = opponentsex_rg.getCheckedRadioButtonId();
-
-        switch (yoursex) {
-            case R.id.your_sex_male:
-                //ваш пол мужской
-                this.your_sex = "m";
-                break;
-            case R.id.your_sex_female:
-                //ваш пол женский
-                this.your_sex = "f";
-                break;
-            default:
-                Toast.makeText(getApplicationContext(), "Выберите ваш пол",
-                        Toast.LENGTH_LONG).show();
-                return;
-        }
-
-
-        switch (opponentsex) {
-            case R.id.opponent_sex_male_radio_button:
-                //ищем мужской
-                this.opponent_sex = "m";
-                break;
-            case R.id.opponent_sex_female_radio_button:
-                // ищем женский
-                this.opponent_sex = "f";
-                break;
-            case R.id.opponent_sex_all_radio_button:
-                //неважно кого искать
-                this.opponent_sex = "all";
-            default:
-                Toast toast = Toast.makeText(getApplicationContext(), "Выберите пол собеседника",
-                        Toast.LENGTH_LONG);
-                toast.show();
-                return;
-
-        }
-
-        this.your_nickname = nickname.getText().toString();
-
-        if (this.your_nickname.length() <= 0) {
-            Toast toast = Toast.makeText(getApplicationContext(), "Введите ваше имя",
-                    Toast.LENGTH_LONG);
-            toast.show();
-            return;
-        }
-    }*/
-
+    /**
+     * Обработчик нажания кнопки "Остановить поиск"
+     *
+     * @param view
+     */
     public void stopSearching(View view) {
         setContentView(R.layout.activity_start_light_version);
         this.search.cancel(true);
@@ -258,26 +193,12 @@ public class MainActivity extends AppCompatActivity {
      * обработчик кнопки
      */
     public void sendMsgBtn(View view) {
-        /*if (!this.first) {
-            EditText editText = findViewById(R.id.messageBox);
-            String message = editText.getText().toString();
-            this.first = true;
-            this.user_id = message;
-            editText.setText("");
-            return;
-        }
-        if (!this.second) {
-            EditText editText = findViewById(R.id.messageBox);
-            String message = editText.getText().toString();
-            this.second = true;
-            this.opponent_id = message;
-            editText.setText("");
-            return;
-        }*/
-
         EditText editText = findViewById(R.id.messageBox);
         String message = editText.getText().toString();
 
+        /**
+         * Класс для отправки сообщения
+         */
         SendMessage n = new SendMessage();
         n.execute("sendMessage", this.user_id, this.opponent_id, message);
 
@@ -308,7 +229,13 @@ public class MainActivity extends AppCompatActivity {
         chatbox.addView(fl, 0);
     }
 
-    public String getId(){
+
+    /**
+     * Полчение id пользователя в чате
+     *
+     * @return
+     */
+    public String getId() {
         SendMessage n = new SendMessage();
         n.execute("getId");
         try {
@@ -322,6 +249,11 @@ public class MainActivity extends AppCompatActivity {
         return "";
     }
 
+    /**
+     * Вывод полученного сообщения на экран
+     *
+     * @param message
+     */
     public void getMsg(String message) {
         FrameLayout fl = new FrameLayout(this);
         fl.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
@@ -348,6 +280,11 @@ public class MainActivity extends AppCompatActivity {
         chatbox.addView(fl, 0);
     }
 
+    /**
+     * Класс для получения сообщений, имеет доступ к интерфейсу
+     * Отрисовка сообщений здесь
+     */
+
     class GetMessage extends AsyncTask<Void, String, Void> {
 
         private String server = ServerSettings.url;
@@ -355,20 +292,33 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            getMsg(values[0]);
+            getMsg(values[0]); // отрисовка полученного сообщения
         }
 
+        /**
+         * Если завершился поток => собеседник завершил диалог
+         * Информирование пользователя о завершении диалога
+         *
+         * @param avoid
+         */
         @Override
         protected void onPostExecute(Void avoid) {
             super.onPostExecute(avoid);
 
-// Java
+
             Toast toast = Toast.makeText(getApplicationContext(),
                     "Ваш собеседник завершил диалог", Toast.LENGTH_LONG);
             toast.show();
             MainActivity.this.setContentView(R.layout.activity_start_light_version);
         }
 
+
+        /**
+         * Проверяем, завершен ли диалог, получаем новые сообщения
+         *
+         * @param voids
+         * @return
+         */
         @Override
         protected Void doInBackground(Void... voids) {
             while (true) {
@@ -395,6 +345,12 @@ public class MainActivity extends AppCompatActivity {
             super.onPreExecute();
         }
 
+        /**
+         * Проверка на окончаение диалога, работа с базой данных
+         *
+         * @param id
+         * @return
+         */
         private boolean dialogIsOver(String id) {
             String url = this.server + "?action=isClosed&user_id=" + id;
             final String USER_AGENT = "Mozilla/5.0";
@@ -449,6 +405,12 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        /**
+         * Получение новых сообщений из базы данных
+         *
+         * @param id идентификатор пользователя текущего
+         * @return
+         */
         private String getMessage(String id) {
             String url = this.server + "?action=getMessage&user=" + id;
             final String USER_AGENT = "Mozilla/5.0";
@@ -513,8 +475,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             MainActivity.this.setContentView(R.layout.activity_opponent_searching);
-
-
                    /* Toast toast = Toast.makeText(getApplicationContext(),
                             "id - " + MainActivity.this.user_id, Toast.LENGTH_SHORT);
                     toast.show();*/
